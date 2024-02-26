@@ -22,6 +22,7 @@ function addUser(e) {
             form.reset();
         })
         .catch(err => {
+            form.reset();
             console.log(err)
         })
     }
