@@ -1,6 +1,8 @@
 // const { where } = require('sequelize');
 const User = require('../models/user');
 
+const bcrypt = require('bcrypt');
+
 exports.postAddUser = async (req, res, next) => {
     console.log(req.body);
     try {
@@ -18,8 +20,15 @@ exports.postAddUser = async (req, res, next) => {
             return res.status(400).json({error: 'User already exists with this email'})
         };
 
-        const newUserDetail = await User.create({name, email, password});
-        res.status(201).json({newUserDetail: newUserDetail});
+        const salt = 10;
+        bcrypt.hash(password, salt, async (err, hash) => {
+            if(err) {
+                throw new Error('Something went wrong in password encryption')
+            }
+            await User.create({name, email, password: hash});
+            res.status(201).json({response: "User successfully created"});
+        })
+        
     }
     catch(err) {
         console.log(err);
@@ -37,14 +46,22 @@ exports.userLoginAuth = async (req, res, next) => {
         });
 
         if (existingUser) {
-            if (existingUser.password === password) {
-                return res.status(200).json({result: "User login sucessful"});
-            }
-            else{
-                return res.status(401).json({result: "User password is wrong"});
-            }
+            bcrypt.compare(password, existingUser.password, (err, result) => {
+                if(err) {
+                    throw new Error('Password is wrong')
+                }
+                if(result) {
+                    res.status(200).json({response: "User login sucessful"});
+                }
+                else{
+                    res.status(401).json({response: "User password is wrong"});
+                }
+            })
         }
-        return res.status(404).json({result: "User not found"});
+        else{
+            res.status(404).json({response: "User not found"});
+        };
+        
     }
     catch(err) {
         console.log(err);
