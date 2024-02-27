@@ -25,7 +25,29 @@ exports.postAddUser = async (req, res, next) => {
         console.log(err);
         res.status(500).json({error: err});
     };
-    
+};
 
+exports.userLoginAuth = async (req, res, next) => {
+    console.log(req.body);
+    try {
+        const {email, password} = req.body;
 
+        const existingUser = await User.findOne({where: {
+            email: email}
+        });
+
+        if (existingUser) {
+            if (existingUser.password === password) {
+                return res.status(200).json({result: "User login sucessful"});
+            }
+            else{
+                return res.status(401).json({result: "User password is wrong"});
+            }
+        }
+        return res.status(404).json({result: "User not found"});
+    }
+    catch(err) {
+        console.log(err);
+        res.status(500).json({error: err})
+    }
 };

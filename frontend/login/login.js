@@ -15,6 +15,7 @@ function userLogin(e) {
     axios.post("http://localhost:3000/user/login", userDetail)
         .then(res => {
             form.reset();
+            console.log(res.data)
         })
         .catch(err => {
             form.reset();
