@@ -1,0 +1,75 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f2f2f2;
+  }
+
+  header {
+    padding: 20px;
+    text-align: center;
+  }
+
+  h1 {
+    color: black;
+    margin: 0;
+  }
+
+  .container {
+    border: 2px solid black;
+    background-color: #fff;
+    max-width: 300px;
+    margin: 20px auto;
+    padding: 20px;
+    text-align: center;
+  }
+
+  label {
+    display: block;
+    margin-bottom: 5px;
+    text-align: left;
+    font-weight: bold;
+  }
+
+  input[type="text"],input[type="number"], select {
+    width: 100%;
+    padding: 5px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+
+  .btn {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  .msg {
+    color: red;
+    margin-bottom: 10px;
+  }
+  .delete {
+    background-color: red;
+    color: white;
+    padding: 5px 10px;
+    text-align: center;
+    font-size: 16px;
+    margin-bottom: 2px;
+    margin-left: 10px;
+    border: 1px solid black;
+    font-weight: bold;
+  }
+  .edit {
+    background-color: rgb(238, 255, 0);
+    color: rgb(10, 2, 2);
+    border: 1px solid black;
+    padding: 5px 10px;
+    text-align: center;
+    font-size: 16px;
+    margin-bottom: 2px;
+    margin-left: 10px;
+    font-weight: bold;
+  }

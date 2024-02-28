@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title >JS For Beginners</title>
+    <link rel="stylesheet" href="expense.css">
+    
+  </head>
+  <body>
+    <header>
+      <h1 >Expense Tracker</h1>
+    </header>
+
+    <section class="container" >
+      <form id="my-form">
+        <!-- <h1>Add User</h1> -->
+        <div id="msg"></div>
+        <div>
+          <label for="amount">Expense Amount</label>
+          <input type="number" id="amount" name="amount" placeholder="Amount expensed in Rupees" required>
+        </div>
+        <div>
+          <label for="disc">Discription</label>
+          <input type="text" id="disc" name="disc" placeholder="Brief Discription" required>
+        </div>
+        <div>
+            <label for="categ">Category:</label>
+            <select id="categ" name="categ" required>
+                <option value="Fuel">Fuel</option>
+                <option value="Food">Food</option>
+                <option value="Movie">Movie</option>
+                <option value="Cab rent">Cab Rent</option>
+                <option value="Rent">Rent</option>
+                <option value="Recharge">Recharge</option>
+                <option value="Other">Other</option>
+
+            </select>
+        </div>
+        <input type="hidden" id="id" name="id">
+        <input class="btn" type="submit" id="submit" value="Add Expense">
+      </form>
+    </section>
+    <ul id="items" >
+        <!-- <li >Item 1 
+            <button class="delete"> X </button>  
+            <button class="edit"> Edit </button> 
+        </li> -->
+    </ul>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.5/axios.min.js"></script>
+    <script src = 'expense.js'></script>
+  </body>
+</html>
