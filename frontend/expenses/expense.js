@@ -3,14 +3,15 @@
 //     return Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
 //   }
 
-const aInput = document.getElementById('amount');
-const dInput = document.getElementById('disc');
-const cInput = document.getElementById('categ');
-const msg = document.getElementById('msg');
-const btn = document.querySelector('.btn');
-const uuid = ('uuid');
-const submitButton = document.getElementById('submit');
-const id = document.getElementById('id');
+// const aInput = document.getElementById('amount');
+// const dInput = document.getElementById('disc');
+// const cInput = document.getElementById('categ');
+// const msg = document.getElementById('msg');
+// const btn = document.querySelector('.btn');
+// const uuid = ('uuid');
+// const submitButton = document.getElementById('submit');
+// const id = document.getElementById('id');
+const token = localStorage.getItem('token');
 
 
 const form = document.getElementById('my-form');
@@ -24,6 +25,7 @@ function addExpense(e) {
     const amount = e.target.amount.value;
     const description = e.target.disc.value;
     const category = e.target.categ.value;
+    console.log(token);
 
     const expenseDetails = {
         amount,
@@ -49,7 +51,7 @@ function addExpense(e) {
 
     // adding data to database
     // else {
-    axios.post("http://localhost:3000/expense/add-expense", expenseDetails)
+    axios.post("http://localhost:3000/expense/add-expense", expenseDetails, {headers: {Authorization: token}})
         .then(res => {
             form.reset();
             showDetailsOnScreen(res.data.newExpenseDetail)
@@ -78,7 +80,7 @@ function showDetailsOnScreen(newExpenseDetail) {
     delbtn.onclick = () => {
 
         let expenseid = newExpenseDetail.id;
-        axios.delete(`http://localhost:3000/expense/delete-expense/${expenseid}`)
+        axios.delete(`http://localhost:3000/expense/delete-expense/${expenseid}`, {headers: {Authorization: token}})
         .then(res => {
             // console.log("NODETODELETE", newListItem);
             parentList.removeChild(newListItem);
@@ -115,7 +117,8 @@ function showDetailsOnScreen(newExpenseDetail) {
 
 
 const getAllExpenses = (req, res, next) => {
-    axios.get("http://localhost:3000/expense/get-expense")
+    const token = localStorage.getItem('token');
+    axios.get("http://localhost:3000/expense/get-expense", {headers: {Authorization: token}} )
         .then((res) => {
             for (let i=0; i < res.data.allExpenseDetail.length; i++) {
                 // console.log('GET', res.data.allUserDetail[i]);

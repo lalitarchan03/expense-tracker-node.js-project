@@ -15,11 +15,14 @@ function userLogin(e) {
     axios.post("http://localhost:3000/user/login", userDetail)
         .then(res => {
             form.reset();
+            alert(res.data.msg);
+            localStorage.setItem('token', res.data.token);
             window.location.href = '../expenses/expense.html'
             console.log(res.data)
         })
         .catch(err => {
             form.reset();
-            console.log(err)
+            console.log(err);
         });
-}
+};
+

@@ -20,9 +20,13 @@ function addUser(e) {
         axios.post("http://localhost:3000/user/add-user", userDetail)
         .then(res => {
             form.reset();
+            // console.log(res.data);
+            alert(res.data.msg);
+            window.location.href = '../login/login.html'
         })
         .catch(err => {
             form.reset();
+            alert(err.response.data.msg);
             console.log(err)
         })
     }

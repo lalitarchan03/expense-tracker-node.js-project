@@ -9,11 +9,13 @@ exports.postAddExpense = async (req, res , next) => {
     };
 
     try{
+        const userId = req.user.id;
+        console.log(req.user.id, "ID POST");
         const amount = req.body.amount;
         const description = req.body.description;
         const category = req.body.category
 
-        const data = await Expense.create({amount: amount, category: category, description: description});
+        const data = await Expense.create({amount: amount, category: category, description: description, userId: userId});
 
         res.status(201).json({newExpenseDetail: data});
     }
@@ -24,7 +26,12 @@ exports.postAddExpense = async (req, res , next) => {
 };
 
 exports.getAllExpense = (req, res, next) => {
-    Expense.findAll()
+    console.log(req.user.id);
+    Expense.findAll({
+        where: {
+            userId: req.user.id
+        }
+    })
         .then(data => {
             res.status(200).json({allExpenseDetail: data});
         })
@@ -46,7 +53,8 @@ exports.deleteExpense = async (req, res, next) => {
 
         await Expense.destroy({
             where: {
-                id: expenseId
+                id: expenseId,
+                userId: req.user.id
             },
         });
         console.log(`Expense with id ${expenseId} is DELETED`);
