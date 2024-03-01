@@ -73,3 +73,23 @@ body {
     margin-left: 10px;
     font-weight: bold;
   }
+  nav {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 10px;
+}
+
+#rzr-buyPremium {
+    background-color: #263aac; /* blue */
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 8px;
+}

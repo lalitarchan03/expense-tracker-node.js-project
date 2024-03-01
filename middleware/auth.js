@@ -7,8 +7,8 @@ exports.authenticate = (req, res, next) => {
     try{
         const token = req.header('Authorization');
         // console.log(token);
-        const tokenPayload = jwt.verify(token, 'secretkey');
-        console.log(tokenPayload.userId, "token");
+        const tokenPayload = jwt.verify(token, process.env.SECRET_KEY);
+        // console.log(tokenPayload.userId, "token");
         User.findByPk(tokenPayload.userId).then(user => {
             req.user = user;
             next();

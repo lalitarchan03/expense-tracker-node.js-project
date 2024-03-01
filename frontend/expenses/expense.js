@@ -3,6 +3,8 @@
 //     return Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
 //   }
 
+// const Razorpay = require("razorpay");
+
 // const aInput = document.getElementById('amount');
 // const dInput = document.getElementById('disc');
 // const cInput = document.getElementById('categ');
@@ -17,6 +19,33 @@ const token = localStorage.getItem('token');
 const form = document.getElementById('my-form');
 form.addEventListener('submit', addExpense);
 
+const buyPremiumBtn = document.getElementById('rzr-buyPremium');
+buyPremiumBtn.onclick = async function (e) {
+    const response = await axios.get('http://localhost:3000/purchase/premium-membership', {headers: {Authorization: token}});
+    console.log(response);
+
+    var options = {
+        "key": response.data.key_id,
+        "orderId": response.data.order.id,
+        "handler": async function (response) {
+            await axios.post('http://localhost:3000/purchase/update-transaction-status', {
+                orderId: options.orderId,
+                paymentId: response.razorpay_payment_id
+            }, {headers: {Authorization: token}} )
+
+            alert('Congratulations! You are a Premium Member Now');
+        } 
+    }
+    const rzp1 = new Razorpay(options);
+    rzp1.open();
+    e.preventDefault();
+
+    rzp1.on('payment.failed', function (response) {
+        console.log(response);
+        alert("Something went wrong")
+    });
+};
+
 // function to run on submitting the form
 function addExpense(e) {
 
@@ -25,7 +54,7 @@ function addExpense(e) {
     const amount = e.target.amount.value;
     const description = e.target.disc.value;
     const category = e.target.categ.value;
-    console.log(token);
+    // console.log(token);
 
     const expenseDetails = {
         amount,

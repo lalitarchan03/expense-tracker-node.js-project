@@ -10,7 +10,7 @@ exports.postAddExpense = async (req, res , next) => {
 
     try{
         const userId = req.user.id;
-        console.log(req.user.id, "ID POST");
+        // console.log(req.user.id, "ID POST");
         const amount = req.body.amount;
         const description = req.body.description;
         const category = req.body.category
@@ -26,7 +26,7 @@ exports.postAddExpense = async (req, res , next) => {
 };
 
 exports.getAllExpense = (req, res, next) => {
-    console.log(req.user.id);
+    // console.log(req.user.id);
     Expense.findAll({
         where: {
             userId: req.user.id
