@@ -1,26 +1,11 @@
 
-// function generateUniqueId() {
-//     return Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
-//   }
-
-// const Razorpay = require("razorpay");
-
-// const aInput = document.getElementById('amount');
-// const dInput = document.getElementById('disc');
-// const cInput = document.getElementById('categ');
-// const msg = document.getElementById('msg');
-// const btn = document.querySelector('.btn');
-// const uuid = ('uuid');
-// const submitButton = document.getElementById('submit');
-// const id = document.getElementById('id');
 const token = localStorage.getItem('token');
-
-// const leaderboardBtn = document.getElementById('leaderboard');
 
 const form = document.getElementById('my-form');
 form.addEventListener('submit', addExpense);
 
 const buyPremiumBtn = document.getElementById('rzr-buyPremium');
+
 buyPremiumBtn.onclick = async function (e) {
     const response = await axios.get('http://localhost:3000/purchase/premium-membership', {headers: {Authorization: token}});
     console.log(response);
@@ -64,6 +49,10 @@ function getLeaderboard(e) {
     axios.get("http://localhost:3000/premium/showLeaderboard", {headers: {Authorization: token}})
         .then(res => {
             console.log(res.data);
+            for (let i=0; i < res.data.length; i++) {
+                // console.log('GET', res.data.allUserDetail[i]);
+                showLeaderboard(res.data[i]);
+            }
         })
         .catch(err => {
             console.log(err)
@@ -86,24 +75,6 @@ function addExpense(e) {
         category,
     };
 
-    // console.log('frontend' ,expenseDetails);
-
-    // if in UPDATE mode
-    // if (submitButton.value === 'Update') {
-    //     console.log('frontend', id.value);
-    //     axios.put(`http://localhost:3000/expense/update-expense/${id.value}`, expenseDetails)
-    //     .then(res => {
-    //         form.reset();
-    //         showDetailsOnScreen(res.data.newExpenseDetail);
-    //         submitButton.value ='Add Expense';
-    //     })
-    //     .catch(err => {
-    //         console.log(err);
-    //     });
-    // }
-
-    // adding data to database
-    // else {
     axios.post("http://localhost:3000/expense/add-expense", expenseDetails, {headers: {Authorization: token}})
         .then(res => {
             form.reset();
@@ -113,9 +84,8 @@ function addExpense(e) {
         .catch(err => {
             console.log(err)
         })
-    // }
+    
 };
-
 
 
 // showing data on screen 
@@ -147,28 +117,15 @@ function showDetailsOnScreen(newExpenseDetail) {
         
     };
 
-    // // edit button 
-    // const editbtn = document.createElement('button');
-    // editbtn.innerText = 'Edit';
-    // editbtn.className = 'edit';
-    // editbtn.onclick = () => {
-        
-    //         aInput.value = newExpenseDetail.amount;
-    //         dInput.value = newExpenseDetail.description;
-    //         cInput.value = newExpenseDetail.category;
-
-    //         submitButton.value = "Update";
-    //         id.value = newExpenseDetail.id;
-    //         console.log('EDIT 1', id.value);
-    //         // uniqueId = uniqueId;
-    //         parentList.removeChild(newListItem);
-        
-    // };
-
     newListItem.appendChild(delbtn);
-    // newListItem.appendChild(editbtn);
-    
 };
+
+function showLeaderboard(leaderboardDetails) {
+    const parentList = document.getElementById('top');
+    const newListItem = document.createElement('li');
+    newListItem.appendChild(document.createTextNode(`Name: ${leaderboardDetails.name}, Total Expense: ${leaderboardDetails.total_expense}`));
+    parentList.appendChild(newListItem);
+}
 
 function showIfpremiumUser() {
     buyPremiumBtn.disabled = true;
@@ -187,7 +144,8 @@ function parseJwt (token) {
 }
 
 
-const getAllExpenses = (req, res, next) => {
+const getAllExpenses = () => {
+
     const token = localStorage.getItem('token');
     const jwtPayload = parseJwt(token);
     console.log(jwtPayload);
