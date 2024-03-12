@@ -4,6 +4,8 @@ const User = require('../models/user');
 
 const Razorpay = require('razorpay');
 
+const userController = require('./user');
+
 exports.purchasePremium = async (req, res, next) => {
     try{
         var rzp = new Razorpay({
@@ -15,6 +17,7 @@ exports.purchasePremium = async (req, res, next) => {
 
         rzp.orders.create({amount, currency: 'INR'}, (err, order) => {
             if (err) {
+                console.log(err);
                 throw new Error(JSON.stringify(err));
             }
             Order.create({orderId: order.id, status: 'PENDING', userId: req.user.id})
@@ -65,7 +68,9 @@ exports.updateTransactionStatus = async (req, res, next) => {
 
         await req.user.update({ isPremiumUser: true });
 
-        res.status(202).json({ success: true, message: 'Transaction Successful' });
+        console.log('Inside update payment',req.user.id, req.user.name, true )
+
+        res.status(202).json({ success: true, message: 'Transaction Successful', token: userController.generateAccessToken(req.user.id, req.user.name, true)});
     }
     catch (err) {
         console.log(err);

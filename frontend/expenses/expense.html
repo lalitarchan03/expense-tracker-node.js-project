@@ -9,7 +9,10 @@
     
   </head>
   <body>
-    <nav><button id="rzr-buyPremium">Buy Premium</button></nav>
+    <nav id="navbar">
+      <button id="rzr-buyPremium">Buy Premium</button>
+      <!-- <button id="leaderboard">Leaderboard</button> -->
+    </nav>
     <header>
       <h1 >Expense Tracker</h1>
     </header>
@@ -43,12 +46,26 @@
         <input class="btn" type="submit" id="submit" value="Add Expense">
       </form>
     </section>
-    <ul id="items" >
+
+    <br>
+
+    <div>
+      <ul id="items" >
         <!-- <li >Item 1 
             <button class="delete"> X </button>  
             <button class="edit"> Edit </button> 
         </li> -->
-    </ul>
+      </ul>
+    </div>
+    
+    <br>
+
+    <div>
+      <ol id="top">
+
+      </ol>
+    </div>
+    
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.5/axios.min.js"></script>
     <script src = 'expense.js'></script>

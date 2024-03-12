@@ -15,6 +15,7 @@
 // const id = document.getElementById('id');
 const token = localStorage.getItem('token');
 
+// const leaderboardBtn = document.getElementById('leaderboard');
 
 const form = document.getElementById('my-form');
 form.addEventListener('submit', addExpense);
@@ -28,12 +29,24 @@ buyPremiumBtn.onclick = async function (e) {
         "key": response.data.key_id,
         "orderId": response.data.order.id,
         "handler": async function (response) {
-            await axios.post('http://localhost:3000/purchase/update-transaction-status', {
-                orderId: options.orderId,
-                paymentId: response.razorpay_payment_id
-            }, {headers: {Authorization: token}} )
+            const res = await axios.post('http://localhost:3000/purchase/update-transaction-status', {
+                        orderId: options.orderId,
+                        paymentId: response.razorpay_payment_id
+                        }, {headers: {Authorization: token}} )
 
             alert('Congratulations! You are a Premium Member Now');
+            buyPremiumBtn.disabled = true;
+            buyPremiumBtn.textContent = 'Premium Member';
+
+            const navbar = document.getElementById('navbar');
+            const leaderboardBtn = document.createElement('button');
+            leaderboardBtn.textContent = 'Leaderboard';
+            leaderboardBtn.classList.add('leaderboardBtn');
+            navbar.appendChild(leaderboardBtn);
+            leaderboardBtn.addEventListener('click', getLeaderboard)
+
+            console.log('token changed', res.data.token);
+            localStorage.setItem('token', res.data.token);
         } 
     }
     const rzp1 = new Razorpay(options);
@@ -45,6 +58,17 @@ buyPremiumBtn.onclick = async function (e) {
         alert("Something went wrong")
     });
 };
+
+function getLeaderboard(e) {
+    e.preventDefault();
+    axios.get("http://localhost:3000/premium/showLeaderboard", {headers: {Authorization: token}})
+        .then(res => {
+            console.log(res.data);
+        })
+        .catch(err => {
+            console.log(err)
+        })
+}
 
 // function to run on submitting the form
 function addExpense(e) {
@@ -91,6 +115,8 @@ function addExpense(e) {
         })
     // }
 };
+
+
 
 // showing data on screen 
 function showDetailsOnScreen(newExpenseDetail) {
@@ -144,9 +170,32 @@ function showDetailsOnScreen(newExpenseDetail) {
     
 };
 
+function showIfpremiumUser() {
+    buyPremiumBtn.disabled = true;
+    buyPremiumBtn.textContent = 'Premium Member';
+
+    const navbar = document.getElementById('navbar');
+    const leaderboardBtn = document.createElement('button');
+    leaderboardBtn.textContent = 'Leaderboard';
+    leaderboardBtn.classList.add('leaderboardBtn');
+    navbar.appendChild(leaderboardBtn);
+    leaderboardBtn.addEventListener('click', getLeaderboard)
+}
+
+function parseJwt (token) {
+    return JSON.parse(atob(token.split('.')[1]));
+}
+
 
 const getAllExpenses = (req, res, next) => {
     const token = localStorage.getItem('token');
+    const jwtPayload = parseJwt(token);
+    console.log(jwtPayload);
+    const isPremiumUser = jwtPayload.isPremiumUser;
+    if (isPremiumUser) {
+        showIfpremiumUser();
+    };
+
     axios.get("http://localhost:3000/expense/get-expense", {headers: {Authorization: token}} )
         .then((res) => {
             for (let i=0; i < res.data.allExpenseDetail.length; i++) {
