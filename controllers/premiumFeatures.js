@@ -5,6 +5,7 @@ const sequelize = require('../util/database');
 
 exports.getLeaderboard = async (req, res, next) => {
     try{
+        // #############    1st WAY      ####################
         // const users = await User.findAll();
         // const expenses = await Expense.findAll();
         // const leaderboardDetail = {};
@@ -33,15 +34,25 @@ exports.getLeaderboard = async (req, res, next) => {
         // console.log(finalLeaderboard);
         // finalLeaderboard.sort((a, b) => b.total_expense-a.total_expense);
         // console.log(finalLeaderboard);
+
+        // ###################    2nd WAY       #########################
+        // const finalLeaderboard = await User.findAll({
+        //     attributes: ['id', 'name', [sequelize.fn('sum', sequelize.col('expenses.amount')), 'total_expense'] ],
+        //     include: [{
+        //         model: Expense,
+        //         attributes: []
+        //     }],
+        //     group: ['user.id'],
+        //     order: [['total_expense', "DESC"]]
+        // });
+
+
+        // #################    3rd WAY (most optimised)     #############
         const finalLeaderboard = await User.findAll({
-            attributes: ['id', 'name', [sequelize.fn('sum', sequelize.col('expenses.amount')), 'total_expense'] ],
-            include: [{
-                model: Expense,
-                attributes: []
-            }],
-            group: ['user.id'],
-            order: [['total_expense', "DESC"]]
-        });
+                attributes: ['id', 'name', 'total_expense_amount' ],
+                order: [['total_expense_amount', "DESC"]]
+            });
+    
 
         res.status(200).json(finalLeaderboard);
     }

@@ -104,8 +104,10 @@ function showDetailsOnScreen(newExpenseDetail) {
 
     delbtn.onclick = () => {
 
-        let expenseid = newExpenseDetail.id;
-        axios.delete(`http://localhost:3000/expense/delete-expense/${expenseid}`, {headers: {Authorization: token}})
+        let expenseId = newExpenseDetail.id;
+        let expenseAmount = newExpenseDetail.amount;
+        console.log(expenseAmount);
+        axios.delete(`http://localhost:3000/expense/delete-expense/${expenseId}/${expenseAmount}`, {headers: {Authorization: token}})
         .then(res => {
             // console.log("NODETODELETE", newListItem);
             parentList.removeChild(newListItem);
@@ -123,7 +125,7 @@ function showDetailsOnScreen(newExpenseDetail) {
 function showLeaderboard(leaderboardDetails) {
     const parentList = document.getElementById('top');
     const newListItem = document.createElement('li');
-    newListItem.appendChild(document.createTextNode(`Name: ${leaderboardDetails.name}, Total Expense: ${leaderboardDetails.total_expense}`));
+    newListItem.appendChild(document.createTextNode(`Name: ${leaderboardDetails.name}, Total Expense: ${leaderboardDetails.total_expense_amount}`));
     parentList.appendChild(newListItem);
 }
 
