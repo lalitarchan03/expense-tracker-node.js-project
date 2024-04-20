@@ -1,7 +1,7 @@
 const forgotPasswordForm = document.getElementById("forgot-password-form");
-forgotPasswordForm.addEventListener('submit', getPassword);
+forgotPasswordForm.addEventListener('submit', postUserDetail);
 
-function getPassword(e) {
+function postUserDetail(e) {
      e.preventDefault();
      const email = e.target.email.value;
      userCredential = {email };

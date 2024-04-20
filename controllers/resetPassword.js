@@ -1,129 +1,38 @@
-// const Sib = require('@getbrevo/brevo');
-// const User = require('../models/user');
-// const { where } = require('sequelize');
 
-// exports.resetPasswordMail = async (req, res, next) => {
-//     // console.log(req.body);
-//     // const {email} = req.body;
-//     // console.log(email);
-
-//     try{
-//         const {email} = req.body;
-
-//         const existingUser = await User.findOne({where: {
-//             email: email
-//         }});
-
-//         if (!existingUser) {
-//             console.log('User not found');
-//             res.status(404).json({message: 'User not found'});
-//         };
-
-//         const Sib = require('@getbrevo/brevo');
-
-//         let apiInstance = new Sib.TransactionalEmailsApi();
-
-//         let apiKey = apiInstance.authentications['apiKey'];
-//         apiKey.apiKey = 'xsmtpsib-8fc5017d460fc77e4a9885ace799005cb3815c9cfc0acedd29a28beada4804c4-2NSGDBh3qZvAYk9j';
-        
-//         const sender = {
-//             email: 'lalitarchan.180670107034@gmail.com',
-//         }
-//         const receivers = [{
-//             email: email,
-//         }]
-
-//         let sendSmtpEmail = new Sib.SendSmtpEmail();
-
-//         sendSmtpEmail.subject = "Reset password for expense tracker app";
-//         sendSmtpEmail.htmlContent = `<h3>Link To Reset Password For Expense App</h3>
-//                     <a href="http://localhost:3000/password/reset-password"> Click Here to reset password</a>`;
-//         sendSmtpEmail.sender = sender;
-//         sendSmtpEmail.to = receivers;
-//         // await transEmailApi.sendTransacEmail({
-//         //     sender,
-//         //     To: receivers,
-//         //     subject: 'Reset password for expense tracker app',
-//         //     textContent: 'Please reset password',
-//         //     htmlContent: `<h3>Link To Reset Password For Expense App</h3>
-//         //     <a href="http://localhost:3000/password/reset-password"> Click Here to reset password</a>`,
-//         // });
-//         const response = await apiInstance.sendTransacEmail(sendSmtpEmail);
-
-//         res.status(201).json({success: true}, response);
-//     }
-//     catch(err) {
-//         console.log(err);
-//         res.status(500).json({err: err});
-//     };
-// };
-// const Sib = require('sib-api-v3-sdk');
-// const User = require('../models/user');
-
-// exports.resetPasswordMail = async (req, res, next) => {
-//     try{
-//         // console.log('email value >>>>',req.body)
-//         const {email} = req.body;
-
-//         // find if email is already present...
-//         const existingUser = await User.findOne({where: {email}});
-//         if(!existingUser){
-//             res.status(404).json({message: 'user not found'});
-//         }
-
-//         // store the token in the database...
-//         // const response = await Forgotpassword.create({
-//         //     id: token,
-//         //     active: true,
-//         //     userId: existingUser.id
-//         // });
-
-//         // send email using send in blue...
-//         const client = Sib.ApiClient.instance;
-//         const apiKey = client.authentications['api-key'];
-//         apiKey.apiKey = process.env.SMTP_KEY;
-//         console.log('key:', process.env.SMTP_KEY);
-
-//         const transEmailApi = new Sib.TransactionalEmailsApi();
-//         const sender = {
-//             'email': 'lalitarchan.180670107034@gmail.com',
-//         }
-//         const receivers = [{
-//             'email': email,
-//         }]
-//         console.log('receiver---', receivers);
-
-//         await transEmailApi.sendTransacEmail({
-//             sender,
-//             To: receivers,
-//             subject: 'reset password for expense tracker app',
-//             textContent: 'please reset password',
-//             htmlContent: `<h3>Link To Reset Password For Expense App</h3>
-//             <a href="http://localhost:3000/password/reset-password"> Click Here to reset password</a>`,
-//         });
-//         res.status(201).json({success: true})
-//     } catch (err) {
-//         console.log(err);
-//         res.status(500).json({ err: err.message });
-//     }
-// };
 const { createTransport } = require('nodemailer');
+
 const User = require('../models/user');
+const ForgotPasswordRequests = require('../models/forgotpassword');
+
+const path = require('path');
+const url = require('url');   
+const bcrypt = require('bcrypt');
+const { where } = require('sequelize');
+
 
 exports.resetPasswordMail = async (req, res, next) => {
     try{
-        console.log('email value >>>>',req.body)
+        
+        const uuid = await crypto.randomUUID();
         const {email} = req.body;
+        // console.log('email value >>>>',req.body)
 
         // find if email is already present...
         const existingUser = await User.findOne({where: {email}});
         if(!existingUser){
             res.status(404).json({message: 'user not found'});
+            return
         }
+
+        // console.log(existingUser.id)
+
+        const data = await ForgotPasswordRequests.create({id: uuid, userId: existingUser.id, isActive: true, isUpdated: false});
+        // console.log(data,"-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=")
 
         const transporter = createTransport({
             host: "smtp-relay.sendinblue.com",
             port: 587,
+            secure: false,
             auth: {
                 user: "lalitarchan.180670107034@gmail.com",
                 pass: process.env.PASS_KEY,
@@ -131,10 +40,14 @@ exports.resetPasswordMail = async (req, res, next) => {
         });
         
         const mailOptions = {
-            from: 'lalitarchan.180670107034@gmail.com',
+            from: {
+                name: 'Expense Tracker',
+                address: 'lalitarchan.180670107034@gmail.com'
+            },
             to: email,
-            subject: `Your subject`,
-            text: `Your text content`
+            subject: `Expense Tracker App Reset Password Link`,
+            text: `You are getting this mail because we have received your request to reset your account password`,
+            html: `You are getting this mail because we have received your request to <a href="http://localhost:3000/password/resetpassword/${uuid}">reset your account password</a>`
         };
         
         transporter.sendMail(mailOptions, function(error, info){
@@ -146,11 +59,78 @@ exports.resetPasswordMail = async (req, res, next) => {
                 res.status(201).json({success: true})
             }
         });
+        // console.log(`http://localhost:3000/password/resetpassword/${uuid}`)
 
-
+        res.status(201).json({success: true})
     }
     catch (err) {
         console.log(err)
-        res.status(500).json({ err: err.message });
+        res.status(500).json({ error: err.message });
     }
-}
+};
+
+
+exports.resetPasswordURLHandling = async (req, res, next) => {
+    try {
+        const id = req.params.uuid;
+        // console.log(id, "------------------------UUID");
+
+        const data = await ForgotPasswordRequests.findByPk(id);
+        // console.log(data,"########################")
+
+        if (data.isActive === true) {
+            // res.redirect('http://localhost:3000/reset_password/reset-password.html');
+            res.redirect(url.format({
+                pathname:"http://localhost:3000/reset_password/reset-password.html",
+                query:{id}
+              })
+            );
+            await data.update({isActive: false})
+        }
+        else{
+            res.status(404).json({message: "This reset password URL is expired."})
+        }
+    }
+    catch (err) {
+        console.log(err)
+        res.status(500).json({ error: err.message });
+    }
+    
+};
+
+exports.updatePassword = async (req, res, next) => {
+    try{
+        const updatePasswordReqId = req.body.id;
+        // console.log(updatePasswordReqId);
+        const password = req.body.password1;
+        // console.log(password);
+
+        const response = await ForgotPasswordRequests.findByPk(updatePasswordReqId, {
+            include: [{
+            model: User,
+            attributes: ['password'] // You can specify which attributes of the associated model to include
+            }]
+        })
+        // console.log(response.user.password, "123456==============================", response.isUpdated, "+++++++++++++++++++++++++++++++++++++++++")
+        
+        if (response.user.password && response.isUpdated === false) {
+            // console.log("inside if000000000000000000000000000000000000000000")
+
+            const salt = 10;
+            const newPassword = await bcrypt.hash(password, salt);
+            // console.log(newPassword);
+            
+            await User.update({ password: newPassword }, {where: {id: response.userId}});
+            await response.update({ isUpdated: true });
+            // await response.update({isUpdated: false})
+
+            res.status(201).json({response: "User password successfully updatedted", message: "Password updated successfully"});
+            return;
+        }
+        res.status(404).json({response: "User not found", message: "Session Expired"});
+
+    }catch (err) {
+        console.log(err);
+        res.status(500).json({error: err});
+    }
+};
